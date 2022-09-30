@@ -1,5 +1,6 @@
 package com.catnip.home.presentation.ui.homefeeds
 
+import android.content.Context
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -10,7 +11,9 @@ import com.catnip.home.R
 import com.catnip.home.databinding.FragmentHomeFeedsBinding
 import com.catnip.home.presentation.adapter.HomeAdapter
 import com.catnip.home.presentation.adapter.HomeAdapterClickListener
+import com.catnip.home.presentation.ui.home.HomeActivity
 import com.catnip.home.presentation.ui.home.HomeViewModel
+import com.catnip.home.presentation.ui.home.ItemActionClickListener
 import com.catnip.shared.data.model.viewparam.MovieViewParam
 import com.catnip.shared.utils.ColorUtils
 import com.catnip.shared.utils.ext.subscribe
@@ -24,6 +27,8 @@ class HomeFeedsFragment : BaseFragment<FragmentHomeFeedsBinding, HomeViewModel>(
 ) {
 
     override val viewModel: HomeViewModel by sharedViewModel()
+
+    private var itemActionClickListener: ItemActionClickListener<MovieViewParam>? = null
 
     private val recyclerViewPool: RecyclerView.RecycledViewPool by lazy {
         RecyclerView.RecycledViewPool()
@@ -40,9 +45,14 @@ class HomeFeedsFragment : BaseFragment<FragmentHomeFeedsBinding, HomeViewModel>(
             }
 
             override fun onMovieClicked(movieViewParam: MovieViewParam) {
-                //todo : on Movie clicked
+                itemActionClickListener?.onItemClick(movieViewParam)
             }
         }, recyclerViewPool)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        itemActionClickListener = (context as? HomeActivity)
     }
 
     private fun setupRecyclerView() {

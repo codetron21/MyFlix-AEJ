@@ -1,5 +1,6 @@
 package com.catnip.home.presentation.ui.watchlist
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
@@ -8,8 +9,13 @@ import com.catnip.core.base.BaseFragment
 import com.catnip.home.R
 import com.catnip.home.databinding.FragmentWatchlistBinding
 import com.catnip.home.presentation.adapter.MovieAdapter
+import com.catnip.home.presentation.ui.home.HomeActivity
 import com.catnip.home.presentation.ui.home.HomeViewModel
+import com.catnip.home.presentation.ui.home.ItemActionClickListener
+import com.catnip.shared.data.model.viewparam.MovieViewParam
+import com.catnip.shared.router.BottomSheetRouter
 import com.catnip.shared.utils.ext.subscribe
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class WatchlistFragment : BaseFragment<FragmentWatchlistBinding, HomeViewModel>(
@@ -18,17 +24,23 @@ class WatchlistFragment : BaseFragment<FragmentWatchlistBinding, HomeViewModel>(
 
     override val viewModel: HomeViewModel by sharedViewModel()
 
-    private val watchlistAdapter by lazy { MovieAdapter(true) {} }
+    private var itemActionClickListener:ItemActionClickListener<MovieViewParam>? = null
+
+    private val watchlistAdapter by lazy {
+        MovieAdapter(true){
+            itemActionClickListener?.onItemClick(it)
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        itemActionClickListener = (context as? HomeActivity)
+    }
 
     override fun initView() {
         setupRecyclerView()
         registerActionListener()
         initData()
-    }
-
-    override fun onDestroyView() {
-        unregisterActionListener()
-        super.onDestroyView()
     }
 
     override fun observeData() {
@@ -57,6 +69,16 @@ class WatchlistFragment : BaseFragment<FragmentWatchlistBinding, HomeViewModel>(
                 }
             )
         }
+    }
+
+    override fun onRefresh() {
+        viewModel.fetchWatchlist()
+        watchlistAdapter.setItems(emptyList())
+    }
+
+    override fun onDestroyView() {
+        unregisterActionListener()
+        super.onDestroyView()
     }
 
     private fun registerActionListener() = with(binding) {
@@ -91,11 +113,6 @@ class WatchlistFragment : BaseFragment<FragmentWatchlistBinding, HomeViewModel>(
 
     companion object {
         private const val LIST_SPAN_COUNT = 3
-    }
-
-    override fun onRefresh() {
-        viewModel.fetchWatchlist()
-        watchlistAdapter.setItems(emptyList())
     }
 
 }

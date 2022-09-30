@@ -8,14 +8,22 @@ import com.catnip.home.R
 import com.catnip.home.databinding.ActivityHomeBinding
 import com.catnip.home.presentation.ui.homefeeds.HomeFeedsFragment
 import com.catnip.home.presentation.ui.watchlist.WatchlistFragment
+import com.catnip.shared.data.model.viewparam.MovieViewParam
+import com.catnip.shared.router.BottomSheetRouter
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeActivity :
-    BaseActivity<ActivityHomeBinding, HomeViewModel>(ActivityHomeBinding::inflate) {
+    BaseActivity<ActivityHomeBinding, HomeViewModel>(ActivityHomeBinding::inflate),
+    ItemActionClickListener<MovieViewParam> {
 
     private val homeFeedsFragment = HomeFeedsFragment()
     private val watchListFragment = WatchlistFragment()
     private var activeFragment: Fragment = homeFeedsFragment
+    private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
+
+    private val bottomSheetRouter by inject<BottomSheetRouter>()
 
     companion object {
         fun createIntent(context: Context): Intent {
@@ -27,6 +35,20 @@ class HomeActivity :
 
     override fun initView() {
         setupFragment()
+    }
+
+    override fun onStop() {
+        bottomSheetDialogFragment?.dismiss()
+        super.onStop()
+    }
+
+    override fun onItemClick(data: MovieViewParam?) {
+        data?.let {
+            bottomSheetRouter.createMovieInfoBottomSheet(it).run {
+                bottomSheetDialogFragment = this
+                show(supportFragmentManager, null)
+            }
+        }
     }
 
     private fun setupFragment() {
@@ -42,6 +64,7 @@ class HomeActivity :
         }.commit()
         // set click menu for changing fragment
         binding.bottomNavView.setOnItemSelectedListener {
+            bottomSheetDialogFragment?.dismiss()
             when (it.itemId) {
                 R.id.home -> {
                     showFragment(homeFeedsFragment)

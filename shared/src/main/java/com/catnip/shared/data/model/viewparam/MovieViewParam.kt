@@ -1,6 +1,10 @@
 package com.catnip.shared.data.model.viewparam
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+
+@Parcelize
 data class MovieViewParam(
     val cast: List<String>,
     val category: List<String>,
@@ -15,4 +19,4 @@ data class MovieViewParam(
     val title: String,
     val trailerUrl: String,
     val videoUrl: String
-)
+) : Parcelable

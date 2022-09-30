@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="format_additional_info">%s - %s - %d</string>
+    <string name="text_add_watchlist_success">Add Watchlist Success</string>
+    <string name="text_remove_watchlist_success">Remove Watchlist Success</string>
+</resources>

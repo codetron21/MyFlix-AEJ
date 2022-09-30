@@ -13,14 +13,14 @@ Github : https://github.com/hermasyp
  **/
 class ActivityRouterImpl : ActivityRouter {
     override fun loginActivity(context: Context): Intent {
-        return Intent(context, LoginActivity::class.java)
+        return LoginActivity.createIntent(context)
     }
 
     override fun homeActivity(context: Context): Intent {
-        return Intent(context, HomeActivity::class.java)
+        return HomeActivity.createIntent(context)
     }
 
     override fun registerActivity(context: Context): Intent {
-        return Intent(context, RegisterActivity::class.java)
+        return RegisterActivity.createIntent(context)
     }
 }

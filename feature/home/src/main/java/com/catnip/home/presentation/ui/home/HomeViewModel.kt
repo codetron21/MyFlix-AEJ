@@ -46,6 +46,7 @@ class HomeViewModel(
             }
         }
     }
+
     fun fetchWatchlist() {
         viewModelScope.launch {
             getUserWatchlistUseCase().collect {

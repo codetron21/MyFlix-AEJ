@@ -2,7 +2,7 @@ package com.catnip.shared.data.model.mapper
 
 import com.catnip.shared.data.model.response.MovieResponse
 import com.catnip.shared.data.model.viewparam.MovieViewParam
-import com.catnip.shared.utils.ViewParamMapper
+import com.catnip.shared.utils.mapper.ViewParamMapper
 
 /**
 Written with love by Muhammad Hermas Yuda Pamungkas

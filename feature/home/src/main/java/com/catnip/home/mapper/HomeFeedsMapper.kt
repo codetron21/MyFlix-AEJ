@@ -5,22 +5,22 @@ import com.catnip.home.data.network.model.response.SectionResponse
 import com.catnip.home.presentation.viewparam.HomeFeedsViewParam
 import com.catnip.home.presentation.viewparam.SectionViewParam
 import com.catnip.shared.data.model.mapper.MovieMapper
-import com.catnip.shared.utils.ListMapper
-import com.catnip.shared.utils.ViewParamMapper
+import com.catnip.shared.utils.mapper.ListMapper
+import com.catnip.shared.utils.mapper.ViewParamMapper
 
 /**
 Written with love by Muhammad Hermas Yuda Pamungkas
 Github : https://github.com/hermasyp
  **/
 
-object HomeFeedsMapper : ViewParamMapper<HomeFeedsResponse,HomeFeedsViewParam>{
+object HomeFeedsMapper : ViewParamMapper<HomeFeedsResponse, HomeFeedsViewParam> {
     override fun toViewParam(dataObject: HomeFeedsResponse?): HomeFeedsViewParam = HomeFeedsViewParam(
         MovieMapper.toViewParam(dataObject?.header),
         ListMapper(SectionMapper).toViewParams(dataObject?.sections)
     )
 }
 
-object SectionMapper : ViewParamMapper<SectionResponse,SectionViewParam>{
+object SectionMapper : ViewParamMapper<SectionResponse, SectionViewParam> {
     override fun toViewParam(dataObject: SectionResponse?): SectionViewParam = SectionViewParam(
         sectionId =  dataObject?.sectionId ?: -1,
         sectionName = dataObject?.sectionName.orEmpty(),

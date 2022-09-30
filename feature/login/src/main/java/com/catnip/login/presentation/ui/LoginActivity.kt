@@ -1,5 +1,6 @@
 package com.catnip.login.presentation.ui
 
+import android.content.Context
 import android.content.Intent
 import androidx.core.view.isVisible
 import com.catnip.core.base.BaseActivity
@@ -17,6 +18,12 @@ class LoginActivity :
     override val viewModel: LoginViewModel by inject()
 
     private val router: ActivityRouter by inject()
+
+    companion object {
+        fun createIntent(context: Context): Intent {
+            return Intent(context, LoginActivity::class.java)
+        }
+    }
 
     override fun initView() {
         binding.btnLogin.setOnClickListener {

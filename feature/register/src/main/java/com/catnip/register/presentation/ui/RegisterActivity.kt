@@ -1,12 +1,12 @@
 package com.catnip.register.presentation.ui
 
+import android.content.Context
 import android.content.Intent
 import androidx.core.view.isVisible
 import com.catnip.core.base.BaseActivity
 import com.catnip.core.exception.FieldErrorException
 import com.catnip.register.constants.RegisterFieldConstants
 import com.catnip.register.databinding.ActivityRegisterBinding
-import com.catnip.register.domain.CheckRegisterFieldUseCase
 import com.catnip.shared.router.ActivityRouter
 import com.catnip.shared.utils.DateUtils.showDatePickerDialog
 import com.catnip.shared.utils.GenderUtils
@@ -17,9 +17,15 @@ import org.koin.android.ext.android.inject
 class RegisterActivity :
     BaseActivity<ActivityRegisterBinding, RegisterViewModel>(ActivityRegisterBinding::inflate) {
 
-    private val router : ActivityRouter by inject()
+    private val router: ActivityRouter by inject()
 
     override val viewModel: RegisterViewModel by inject()
+
+    companion object {
+        fun createIntent(context: Context): Intent {
+            return Intent(context, RegisterActivity::class.java)
+        }
+    }
 
     override fun initView() {
         binding.etBirthdate.setOnClickListener {
@@ -59,6 +65,7 @@ class RegisterActivity :
             })
         }
     }
+
     private fun showLoading(isShowLoading: Boolean) {
         binding.pbLoading.isVisible = isShowLoading
     }
@@ -94,6 +101,7 @@ class RegisterActivity :
         binding.tilUsername.isErrorEnabled = false
         binding.tilPassword.endIconMode = TextInputLayout.END_ICON_PASSWORD_TOGGLE
     }
+
     private fun navigateToHome() {
         startActivity(router.homeActivity(this).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
