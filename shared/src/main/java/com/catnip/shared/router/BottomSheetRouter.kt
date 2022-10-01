@@ -1,8 +1,8 @@
 package com.catnip.shared.router
 
+import com.catnip.core.listener.BottomSheetApi
 import com.catnip.shared.data.model.viewparam.MovieViewParam
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 interface BottomSheetRouter {
-    fun createMovieInfoBottomSheet(movieViewParam: MovieViewParam): BottomSheetDialogFragment
+    fun createMovieInfoBottomSheet(movieViewParam: MovieViewParam): BottomSheetApi
 }

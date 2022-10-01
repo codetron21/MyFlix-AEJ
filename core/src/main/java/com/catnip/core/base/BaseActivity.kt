@@ -47,4 +47,8 @@ abstract class BaseActivity<B : ViewBinding, VM : ViewModel>(
         onBackPressed()
         return super.onSupportNavigateUp()
     }
+
+    open fun showToastMessage(message:String?,duration:Int = Toast.LENGTH_SHORT){
+        Toast.makeText(this, message, duration).show()
+    }
 }

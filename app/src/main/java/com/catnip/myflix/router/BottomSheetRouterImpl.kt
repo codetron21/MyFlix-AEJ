@@ -1,12 +1,12 @@
 package com.catnip.myflix.router
 
+import com.catnip.core.listener.BottomSheetApi
 import com.catnip.shared.data.model.viewparam.MovieViewParam
 import com.catnip.shared.router.BottomSheetRouter
 import com.codetron.movieinfo.presentation.ui.MovieInfoBottomSheet
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class BottomSheetRouterImpl : BottomSheetRouter {
-    override fun createMovieInfoBottomSheet(movieViewParam: MovieViewParam): BottomSheetDialogFragment {
+    override fun createMovieInfoBottomSheet(movieViewParam: MovieViewParam): BottomSheetApi {
         return MovieInfoBottomSheet(movieViewParam)
     }
 }

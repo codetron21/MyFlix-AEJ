@@ -49,4 +49,8 @@ abstract class BaseFragment<B : ViewBinding, VM : ViewModel>(
             Toast.makeText(requireContext(), requireContext().getErrorMessage(exception), Toast.LENGTH_SHORT).show()
         }
     }
+
+    open fun showToastMessage(message:String?,duration:Int = Toast.LENGTH_SHORT){
+        Toast.makeText(requireContext(), message, duration).show()
+    }
 }

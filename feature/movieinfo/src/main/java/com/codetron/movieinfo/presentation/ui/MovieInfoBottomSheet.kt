@@ -1,12 +1,14 @@
 package com.codetron.movieinfo.presentation.ui
 
-import android.widget.Toast
+import android.content.DialogInterface
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import coil.load
 import com.catnip.core.base.BaseBottomSheetDialog
+import com.catnip.core.listener.NotifyListener
 import com.catnip.shared.data.model.viewparam.MovieViewParam
 import com.catnip.shared.router.ActivityRouter
-import com.catnip.shared.utils.MovieAttributeUtils
+import com.catnip.shared.utils.CommonUtils
 import com.catnip.shared.utils.ext.subscribe
 import com.catnip.styling.databinding.BottomSheetMovieInfoBinding
 import com.codetron.movieinfo.R
@@ -20,29 +22,46 @@ class MovieInfoBottomSheet(
 ) {
 
     override val viewModel by viewModel<MovieInfoViewModel>()
-
     private val activityRouter by inject<ActivityRouter>()
+    private var myWatchListClicked: Boolean = false
+    private var notifyListener: NotifyListener<Boolean>? = null
 
     override fun initView() {
         setData()
         setActionListeners()
     }
 
+    override fun display(fm: FragmentManager, tag: String?) {
+        show(fm, tag)
+    }
+
+    override fun hide() {
+        dismiss()
+    }
+
+    override fun onExit(notifyListener: NotifyListener<Boolean>) {
+        this.notifyListener = notifyListener
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        notifyListener?.runNotify(myWatchListClicked)
+        super.onCancel(dialog)
+    }
+
     override fun observeData() {
-        viewModel.getWatchlistResult().observe(this) {
-            it.subscribe(
+        viewModel.getWatchlistResult().observe(this) { resources ->
+            resources.subscribe(
                 doOnSuccess = {
-                    dismiss()
-                    Toast.makeText(
-                        requireContext(),
+                    val message = getString(
                         if (it.payload?.isUserWatchlist == true)
-                            getString(R.string.text_add_watchlist_success)
-                        else
-                            getString(R.string.text_remove_watchlist_success),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                            R.string.text_add_watchlist_success
+                        else R.string.text_remove_watchlist_success
+                    )
+
+                    showToastMessage(message)
+                    binding.ivWatchlist.setImageResource(CommonUtils.getWatchlistIcon(movieViewParam.isUserWatchlist))
                 }, doOnError = {
-                    dismiss()
+                    showToastMessage(it.message.orEmpty())
                 })
         }
     }
@@ -51,33 +70,31 @@ class MovieInfoBottomSheet(
         ivPoster.load(movieViewParam.posterUrl)
         tvMovieTitle.text = movieViewParam.title
         tvShortDesc.text = movieViewParam.overview
-        tvAdditionalInfo.text = getString(
-            R.string.format_additional_info,
-            movieViewParam.releaseDate,
-            movieViewParam.filmRate,
-            MovieAttributeUtils.formatRuntime(movieViewParam.runtime),
-        )
+        tvAdditionalInfo.text = CommonUtils.getAdditionalMovieInfo(movieViewParam)
+        ivWatchlist.setImageResource(CommonUtils.getWatchlistIcon(movieViewParam.isUserWatchlist))
     }
 
     private fun setActionListeners() = with(binding) {
         ivClose.setOnClickListener {
-            dismiss()
+            notifyListener?.runNotify(myWatchListClicked)
+            hide()
         }
 
         llPlayMovie.setOnClickListener {
-            Toast.makeText(requireContext(), "play-movie", Toast.LENGTH_SHORT).show()
+            // todo: play movie
         }
 
         llMyList.setOnClickListener {
+            myWatchListClicked = true
             viewModel.addOrRemoveWatchlist(movieViewParam)
         }
 
         llShare.setOnClickListener {
-            Toast.makeText(requireContext(), "share-movie", Toast.LENGTH_SHORT).show()
+            CommonUtils.shareFilm(requireContext(), movieViewParam)
         }
 
         tvDetailMovie.setOnClickListener {
-            Toast.makeText(requireContext(), "detail-movie", Toast.LENGTH_SHORT).show()
+            // todo: detail movie
         }
     }
 

@@ -6,41 +6,44 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.catnip.core.base.BaseFragment
+import com.catnip.core.listener.NotifyListener
 import com.catnip.home.R
 import com.catnip.home.databinding.FragmentWatchlistBinding
 import com.catnip.home.presentation.adapter.MovieAdapter
 import com.catnip.home.presentation.ui.home.HomeActivity
 import com.catnip.home.presentation.ui.home.HomeViewModel
-import com.catnip.home.presentation.ui.home.ItemActionClickListener
+import com.catnip.home.presentation.ui.home.OnDataRefreshListener
 import com.catnip.shared.data.model.viewparam.MovieViewParam
-import com.catnip.shared.router.BottomSheetRouter
 import com.catnip.shared.utils.ext.subscribe
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class WatchlistFragment : BaseFragment<FragmentWatchlistBinding, HomeViewModel>(
     FragmentWatchlistBinding::inflate
-), SwipeRefreshLayout.OnRefreshListener {
+), SwipeRefreshLayout.OnRefreshListener, OnDataRefreshListener {
 
     override val viewModel: HomeViewModel by sharedViewModel()
 
-    private var itemActionClickListener:ItemActionClickListener<MovieViewParam>? = null
+    private var notifyListener: NotifyListener<MovieViewParam>? = null
 
     private val watchlistAdapter by lazy {
-        MovieAdapter(true){
-            itemActionClickListener?.onItemClick(it)
+        MovieAdapter(true) {
+            notifyListener?.runNotify(it)
         }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        itemActionClickListener = (context as? HomeActivity)
+        notifyListener = (context as? HomeActivity)
     }
 
     override fun initView() {
         setupRecyclerView()
         registerActionListener()
         initData()
+    }
+
+    override fun refresh() {
+        viewModel.fetchWatchlist()
     }
 
     override fun observeData() {
@@ -64,6 +67,7 @@ class WatchlistFragment : BaseFragment<FragmentWatchlistBinding, HomeViewModel>(
                     error.exception?.let { e -> showError(true, e) }
                 },
                 doOnEmpty = {
+                    watchlistAdapter.setItems(emptyList())
                     showLoading(false)
                     showEmptyMessage(true)
                 }

@@ -1,19 +1,20 @@
 package com.catnip.home.presentation.ui.homefeeds
 
 import android.content.Context
-import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.catnip.core.base.BaseFragment
+import com.catnip.core.listener.NotifyListener
 import com.catnip.home.R
 import com.catnip.home.databinding.FragmentHomeFeedsBinding
 import com.catnip.home.presentation.adapter.HomeAdapter
 import com.catnip.home.presentation.adapter.HomeAdapterClickListener
 import com.catnip.home.presentation.ui.home.HomeActivity
 import com.catnip.home.presentation.ui.home.HomeViewModel
-import com.catnip.home.presentation.ui.home.ItemActionClickListener
+import com.catnip.home.presentation.ui.home.OnDataRefreshListener
 import com.catnip.shared.data.model.viewparam.MovieViewParam
 import com.catnip.shared.utils.ColorUtils
 import com.catnip.shared.utils.ext.subscribe
@@ -24,11 +25,11 @@ import kotlin.math.min
 
 class HomeFeedsFragment : BaseFragment<FragmentHomeFeedsBinding, HomeViewModel>(
     FragmentHomeFeedsBinding::inflate
-) {
+),OnDataRefreshListener {
 
     override val viewModel: HomeViewModel by sharedViewModel()
 
-    private var itemActionClickListener: ItemActionClickListener<MovieViewParam>? = null
+    private var notifyListener: NotifyListener<MovieViewParam>? = null
 
     private val recyclerViewPool: RecyclerView.RecycledViewPool by lazy {
         RecyclerView.RecycledViewPool()
@@ -45,14 +46,18 @@ class HomeFeedsFragment : BaseFragment<FragmentHomeFeedsBinding, HomeViewModel>(
             }
 
             override fun onMovieClicked(movieViewParam: MovieViewParam) {
-                itemActionClickListener?.onItemClick(movieViewParam)
+                notifyListener?.runNotify(movieViewParam)
             }
         }, recyclerViewPool)
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        itemActionClickListener = (context as? HomeActivity)
+        notifyListener = (context as? HomeActivity)
+    }
+
+    override fun refresh() {
+        homeAdapter.notifyDataSetChanged()
     }
 
     private fun setupRecyclerView() {
@@ -73,7 +78,6 @@ class HomeFeedsFragment : BaseFragment<FragmentHomeFeedsBinding, HomeViewModel>(
             })
         }
     }
-
 
     override fun initView() {
         setupRecyclerView()
@@ -114,19 +118,19 @@ class HomeFeedsFragment : BaseFragment<FragmentHomeFeedsBinding, HomeViewModel>(
                 )
             })
         }
-        viewModel.getWatchlistResult().observe(this) {
-            it.subscribe(
-                doOnSuccess = {
-                    Toast.makeText(
-                        requireContext(),
-                        if (it.payload?.isUserWatchlist == true)
-                            getString(R.string.text_add_watchlist_success)
-                        else
-                            getString(R.string.text_remove_watchlist_success),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }, doOnError = {
 
+        viewModel.getWatchlistResult().observe(this) { resources ->
+            resources.subscribe(
+                doOnSuccess = {
+                    val message = getString(
+                        if (it.payload?.isUserWatchlist == true) R.string.text_add_watchlist_success
+                        else R.string.text_remove_watchlist_success
+                    )
+
+                    showToastMessage(message)
+                    refresh()
+                }, doOnError = {
+                    showToastMessage(it.message.orEmpty())
                 })
         }
     }
