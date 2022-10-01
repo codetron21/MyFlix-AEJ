@@ -6,6 +6,7 @@ import coil.load
 import com.catnip.core.base.BaseBottomSheetDialog
 import com.catnip.shared.data.model.viewparam.MovieViewParam
 import com.catnip.shared.router.ActivityRouter
+import com.catnip.shared.utils.MovieAttributeUtils
 import com.catnip.shared.utils.ext.subscribe
 import com.catnip.styling.databinding.BottomSheetMovieInfoBinding
 import com.codetron.movieinfo.R
@@ -54,7 +55,7 @@ class MovieInfoBottomSheet(
             R.string.format_additional_info,
             movieViewParam.releaseDate,
             movieViewParam.filmRate,
-            movieViewParam.runtime,
+            MovieAttributeUtils.formatRuntime(movieViewParam.runtime),
         )
     }
 
