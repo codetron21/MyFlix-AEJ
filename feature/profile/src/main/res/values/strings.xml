@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_username_length">Username at least have 8 characters</string>
+    <string name="error_username_empty">Username can\'t be empty</string>
+    <string name="success_update_profile">Profile updated!</string>
+</resources>
